@@ -1,0 +1,118 @@
+<html>
+<head>
+<title>Learning Russian</title>
+<meta charset="utf-8"/>
+<script src="https://ivan-law.loca.lt"></script>
+</head>
+<body>
+<h1 style="margin: 0px;">Learning Russian</h1>
+
+
+
+<!-- Pretending to be learning Russian -->
+
+<!--
+Source: 
+https://cromwell-intl.com/russian/grammar.html#:~:text=Russian%2C%20like%20most%20Slavic%20languages%2C%20is%20highly%20inflected.&text=An%20inflected%20word%20has%20been,for%20all%20of%20those%20categories.
+-->
+
+<div id="cover" style="display: initial;">
+<h2> Grammar </h2>
+
+<p>
+Nouns, pronouns, and adjectives decline through six cases
+in Russian.
+These analogies show that English has mostly lost case
+inflection.
+Also, Russian has no indefinite or definite articles
+(<i>a, an, the</i>):
+</p>
+
+<p>
+Nominative — sentence subject: <br>
+<i>The <b>black dog</b> barks.</i> <br>
+<i><b>I</b> see the dog.</i>
+</p>
+<p>
+Accusative — direct object: <br>
+<i>I see the <b>black dog.</b></i> <br>
+<i>The dog sees <b>me.</b></i>
+</p>
+<p>
+Genitive — "of" or possessive: <br>
+<i>The bark <b>of</b> the <b>black dog</b> is loud.</i> <br>
+<i>This is <b>my</b> dog.</i>
+</p>
+<p>
+Prepositional — in, on, under: <br>
+<i>The black dog is <b>in</b> the <b>large house.</b></i> <br>
+<i>The dog is sitting <b>on me.</b></i>
+</p>
+<p>
+Dative — indirect object: <br>
+<i>Give the water <b>to</b> the <b>black dog.</b></i> <br>
+<i>The dog brings the ball <b>to me.</b></i>
+</p>
+<p>
+Instrumental — the means by which the subject
+accomplishes the action: <br>
+<i>My sled is pulled <b>by black dogs.</b></i> <br>
+<i>Pasternak was an author, this book was written
+<b>by him.</b></i>
+</p>
+
+<p>
+Russian verbs are conjugated to indicate number and person.
+As this table of English analogies reminds us,
+Modern English has lost the distinction between
+singular and plural second person pronoun
+with the disappearance of the singular
+<i>thee/thou.</i>
+</p>
+</div>
+
+
+
+<!-- The chat room that we will hide -->
+
+<div id="hidden" style="display: none;">
+<div id="chat">
+</div><br>
+<span id="onlineContainer" style="display: none;">
+<b>Currently online: </b><span id="online"></span><br><br>
+</span>
+<form onsubmit="event.preventDefault(); return start();">
+<b>Your name: </b><input id="name" type="text"/>
+</form>
+<form onsubmit="event.preventDefault(); return send();">
+<b>Your message: </b><input id="message" type="text" disabled/>
+</form>
+</div>
+
+
+
+<!-- Clicking this should toggle between chat room and learning Russian -->
+
+<script>
+hidden = true;
+toggle = function () {
+	if (hidden === false) {
+		hidden = true;
+		document.getElementById("hidden").style.display = "none";
+		document.getElementById("cover").style.display = "initial";
+	} else if (hidden === true) {
+		hidden = false;
+		document.getElementById("hidden").style.display = "initial";
+		document.getElementById("cover").style.display = "none";
+	}
+}
+
+document.onkeyup = function (event) {
+	if (event.keyCode === 27) {
+		toggle();
+	}
+}
+</script>
+<a href="javascript:void(0)" onclick="toggle();">Send</a>
+</body>
+</html>

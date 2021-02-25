@@ -1,0 +1,1 @@
+A chat room that I made to learn Websockets and use as a lesson to teach my friend some basic HTML, CSS and JavaScript. 
