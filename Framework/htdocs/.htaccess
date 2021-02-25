@@ -1,0 +1,7 @@
+ErrorDocument 400 http://cingjue.rf.gd/errorPages/400/
+ErrorDocument 401 http://cingjue.rf.gd/errorPages/401/
+ErrorDocument 403 http://cingjue.rf.gd/errorPages/403/
+ErrorDocument 404 http://cingjue.rf.gd/errorPages/404/
+ErrorDocument 503 http://cingjue.rf.gd/errorPages/503/
+RewriteEngine On
+RewriteRule ^(.+)$ index.php [QSA,L]

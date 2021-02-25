@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Demonstrations</title>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="/main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
+<script> if (typeof Vue === "undefined") document.write("<script src=\"libraries\/vue.min.js\"><\/script>"); </script>
+</head>
+<body>
+<h1>Demonstrations</h1>
+<div id="app">
+<a v-bind:href="(mode !== 0) ? 'javascript:void(0);' : false" onclick="app.mode = 0;">Using Socket.IO</a> | 
+<a v-bind:href="(mode !== 1) ? 'javascript:void(0);' : false" onclick="app.mode = 1;">Playing Music</a> | 
+<a v-bind:href="(mode !== 2) ? 'javascript:void(0);' : false" onclick="app.mode = 2;">Playing Video</a>
+
+<div id="chatPage" v-show="mode === 0">
+<h3>Using Socket.IO</h3>
+<div v-if="messages.length > 0" style="border: 1px solid #000000; background-color: #EEEEEE; padding: 1em; padding-bottom: 0em; margin-bottom: 1em; width: 640px;" v-cloak>
+<div style="padding-bottom: 1em;" v-for="(message, index) in messages">
+<span v-if="message.action === 'message'">
+<span style='vertical-align: top;'><b>{{ message.from }}: </b></span>
+<div style='display: inline-block;'>{{ message.content }}</div>
+</span>
+<span v-if="message.action === 'error'">
+<button class="iconed" style="float: right;" v-on:click="messages.splice(index, 1); $event.currentTarget.blur();"><img v-bind:src="icon.src"></button>
+<span style="display: block;">{{ message.content }}</span>
+</span>
+</div>
+</div>
+<div>
+<span id="onlineContainer" style="display: none;">
+<b>Currently online: </b><span id="online"></span><br><br>
+</span>
+<form id="nameForm" style="display: initial;" onsubmit="event.preventDefault(); return start();" autocomplete="off">
+<b>Your name: </b><input id="name" type="text"/>
+</form>
+<form id="messageForm" style="display: none;" onsubmit="event.preventDefault(); return send();" autocomplete="off">
+<b>Your message: </b><input id="message" type="text" disabled/>
+</form>
+</div>
+</div>
+
+<div id="musicPage" v-show="mode === 1"></div>
+
+<div id="videoPage" v-show="mode === 2"></div>
+
+</div>
+
+<script>
+var app = new Vue({
+	"el": "#app", 
+	"data": {
+		"mode": 0, 
+		"messages": [], 
+		"icon": new Image()
+	}
+});
+
+// Preload the icon that will be used
+app.icon.src = "https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/svg/x.svg";
+app.icon.onerror = () => {
+	app.icon.src = "/libraries/open-iconic/svg/x.svg";
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js"></script>
+<script> if (typeof io === "undefined") document.write("<script src=\"libraries\/socket.io.min.js\"><\/script>"); </script>
+<script src="client.js"></script>
+<script src="audio.js"></script>
+<script src="video.js"></script>
+<script>
+xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+	if (this.readyState == 4 && this.status == 200) {
+		host = "http://" + this.responseText + ":80";
+		document.getElementById("musicPage").innerHTML = '<h3>Playing Music</h3><custom-audio src="/sound.mp3"></custom-audio>';
+		document.getElementById("videoPage").innerHTML = '<h3>Playing Video</h3><custom-video src="/video.mp4"></custom-video>';
+	}
+};
+xhttp.open("GET", "/localtunnel.txt", true);
+xhttp.send();
+</script>
+</body>
+</html>

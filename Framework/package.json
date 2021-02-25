@@ -1,0 +1,9 @@
+{
+	"name": "cingjue.rf.gd",
+	"version": "1.0.0",
+	"dependencies": {
+		"http-proxy": "^1.18.1",
+		"localtunnel": "^2.0.1",
+		"puppeteer": "^5.5.0"
+	}
+}
