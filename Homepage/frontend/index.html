@@ -1,58 +1,116 @@
 <html>
 <head>
-<title>Demonstrations</title>
+<title>Online Chronicle</title>
 <meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=0.65">
+<link rel="icon" href="/resources/favicon.ico" type="image/x-icon"/>
 <link rel="stylesheet" href="/main.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
 <script> if (typeof Vue === "undefined") document.write("<script src=\"libraries\/vue.min.js\"><\/script>"); </script>
 </head>
 <body>
-<h1>Demonstrations</h1>
-<div id="app">
-<a v-bind:href="(mode !== 0) ? 'javascript:void(0);' : false" onclick="app.mode = 0;">Using Socket.IO</a> | 
-<a v-bind:href="(mode !== 1) ? 'javascript:void(0);' : false" onclick="app.mode = 1;">Playing Music</a> | 
-<a v-bind:href="(mode !== 2) ? 'javascript:void(0);' : false" onclick="app.mode = 2;">Playing Video</a>
-
-<div id="chatPage" v-show="mode === 0">
-<h3>Using Socket.IO</h3>
-<div v-if="messages.length > 0" style="border: 1px solid #000000; background-color: #EEEEEE; padding: 1em; padding-bottom: 0em; margin-bottom: 1em; width: 640px;" v-cloak>
-<div style="padding-bottom: 1em;" v-for="(message, index) in messages">
-<span v-if="message.action === 'message'">
-<span style='vertical-align: top;'><b>{{ message.from }}: </b></span>
-<div style='display: inline-block;'>{{ message.content }}</div>
-</span>
-<span v-if="message.action === 'error'">
-<button class="iconed" style="float: right;" v-on:click="messages.splice(index, 1); $event.currentTarget.blur();"><img v-bind:src="icon.src"></button>
-<span style="display: block;">{{ message.content }}</span>
-</span>
-</div>
-</div>
-<div>
-<span id="onlineContainer" style="display: none;">
-<b>Currently online: </b><span id="online"></span><br><br>
-</span>
-<form id="nameForm" style="display: initial;" onsubmit="event.preventDefault(); return start();" autocomplete="off">
-<b>Your name: </b><input id="name" type="text"/>
-</form>
-<form id="messageForm" style="display: none;" onsubmit="event.preventDefault(); return send();" autocomplete="off">
-<b>Your message: </b><input id="message" type="text" disabled/>
-</form>
-</div>
+<div id="app" style="display: flex;">
+<div style="text-align: center; vertical-align: top; padding-right: 1.5em;">
+	<a href="/"><img src="/resources/logo.png" style="width: 150px; cursor: default;"></img></a><br><br>
+	<div style="display: inline-block; text-align: right;">
+		<a v-bind:href="(mode !== 0) ? 'javascript:void(0);' : false" onclick="app.mode = 0;" v-cloak>{{ modeNames[0] }}</a><br><br>
+		<a v-bind:href="(mode !== 1) ? 'javascript:void(0);' : false" onclick="app.mode = 1;" v-cloak>{{ modeNames[1] }}</a><br><br>
+		<a v-bind:href="(mode !== 2) ? 'javascript:void(0);' : false" onclick="app.mode = 2;" v-cloak>{{ modeNames[2] }}</a>
+	</div>
 </div>
 
-<div id="musicPage" v-show="mode === 1"></div>
-
-<div id="videoPage" v-show="mode === 2"></div>
-
+<div style="vertical-align: top; margin-top: -2em; flex-grow: 1;">
+	<keep-alive>
+		<rendered-chat v-if="mode === 0" v-bind:messages="messages" v-bind:icon="icon" v-cloak></rendered-chat>
+		<rendered-music v-if="mode === 1" v-cloak></rendered-music>
+		<rendered-video v-if="mode === 2" v-cloak></rendered-video>
+	</keep-alive>
+</div>
 </div>
 
 <script>
+const routeNames = ["chat", "music", "video"];
+for (let i = 0; i < 3; i++) {
+	Vue.component("rendered-" + routeNames[i], function (resolve, reject) {
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var component = JSON.parse(this.responseText);
+				
+				// Load the scripts that the component uses
+				var scripts = component.scripts;
+				delete component.scripts;
+				for (let j = 0; j < scripts.length; j++) {
+					// Check has the script already been previously loaded to avoid duplicates
+					let existingScripts = document.getElementsByTagName("head")[0].getElementsByTagName("script");
+					
+					var found = false;
+					for (let k = 0; k < existingScripts.length; k++) {
+						if (existingScripts[k].src.endsWith(scripts[j].path)) found = true;
+					}
+					
+					if (found === false) {
+						// console.log("will load", scripts[j]);
+						let scriptTag = document.createElement("script");
+						scriptTag.defer = true;
+						scriptTag.async = false;
+						document.getElementsByTagName("head")[0].appendChild(scriptTag);
+						scriptTag.onload = function () {
+							// console.log("loaded", scripts[j]);
+							// If the script from scripts[j].path is sourced from a CDN, check whether or not the script has actually been loaded successfully and load the locally stored backup if the script has not been loaded
+							if (scripts[j].check && scripts[j].backup) {
+								if (typeof window[scripts[j].check] === "undefined") {
+									found = false;
+									for (let k = 0; k < existingScripts.length; k++) {
+										if (existingScripts[k].src.endsWith(scripts[j].backup)) found = true;
+									}
+									
+									if (found === false) {
+										let backupScriptTag = document.createElement("script");
+										backupScriptTag.defer = true;
+										backupScriptTag.async = false;
+										document.getElementsByTagName("head")[0].appendChild(backupScriptTag);
+										backupScriptTag.src = scripts[j].backup;
+									}
+								}
+							}
+						}
+						scriptTag.src = scripts[j].path;
+					}
+				}
+				resolve(component);
+			}
+		};
+		xhttp.open("GET", "/pages/" + routeNames[i] + ".json", true);
+		xhttp.send();
+	});
+}
+
+Vue.directive("focus", {
+	"inserted": function (element) {
+		document.getElementById("messageBox").scrollTop = document.getElementById("messageBox").scrollHeight;
+	}
+});
+
 var app = new Vue({
 	"el": "#app", 
 	"data": {
-		"mode": 0, 
+		"mode": null, 
+		"modeNames": ["Chat Room", "Playing Music", "Playing Video"], 
+		"routeNames": routeNames, 
+		"suppressEvaluateMode": false, 
 		"messages": [], 
 		"icon": new Image()
+	}, 
+	"watch": {
+		"mode": function (newMode, oldMode) {
+			// console.log("watch", this.suppressEvaluateMode);
+			if (this.suppressEvaluateMode === false) {
+				document.title = this.modeNames[newMode];
+				window.history.pushState(null, null, "#!/" + this.routeNames[newMode]);
+			}
+			this.suppressEvaluateMode = false;
+		}
 	}
 });
 
@@ -60,24 +118,25 @@ var app = new Vue({
 app.icon.src = "https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/svg/x.svg";
 app.icon.onerror = () => {
 	app.icon.src = "/libraries/open-iconic/svg/x.svg";
-}
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js"></script>
-<script> if (typeof io === "undefined") document.write("<script src=\"libraries\/socket.io.min.js\"><\/script>"); </script>
-<script src="client.js"></script>
-<script src="audio.js"></script>
-<script src="video.js"></script>
-<script>
-xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-	if (this.readyState == 4 && this.status == 200) {
-		host = "http://" + this.responseText + ":80";
-		document.getElementById("musicPage").innerHTML = '<h3>Playing Music</h3><custom-audio src="/sound.mp3"></custom-audio>';
-		document.getElementById("videoPage").innerHTML = '<h3>Playing Video</h3><custom-video src="/video.mp4"></custom-video>';
-	}
 };
-xhttp.open("GET", "/localtunnel.txt", true);
-xhttp.send();
+
+const evaluateMode = function () {
+	// console.log("eval", app.suppressEvaluateMode);
+	if (app.suppressEvaluateMode === false) {
+		if (app.routeNames.indexOf(window.location.hash.substring(3)) !== -1) {
+			app.suppressEvaluateMode = true;
+			app.mode = app.routeNames.indexOf(window.location.hash.substring(3));
+		} else {
+			app.suppressEvaluateMode = true;
+			app.mode = 0;
+		}
+	} else {
+		app.suppressEvaluateMode = false;
+	}
+}
+
+window.onpopstate = evaluateMode;
+evaluateMode();
 </script>
 </body>
 </html>

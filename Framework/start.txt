@@ -1,0 +1,2 @@
+cd server
+node -r esm bin/server

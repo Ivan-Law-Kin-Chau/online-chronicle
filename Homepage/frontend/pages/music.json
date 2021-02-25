@@ -1,0 +1,11 @@
+{
+	"scripts": [
+		{
+			"path": "/media.js"
+		}, 
+		{
+			"path": "/audio.js"
+		}
+	], 
+	"template": "<div>\n<h3>Playing Music</h3>\n<custom-audio src=\"\/sound.mp3\"></custom-audio>\n</div>"
+}

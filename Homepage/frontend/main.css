@@ -153,22 +153,11 @@ input[type=range]:focus::-moz-range-thumb {
 	outline: 1.5px solid #6666FF;
 }
 
-#slider1 {
-	background-color: #EEEEEE;
-	width: 160px;
-	height: 0.775em;
-	display: inline-block;
-	margin: 0px 4px;
-	position: relative;
-	top: 0.2em;
-	border: 1px solid #000000;
-}
-
-#slider2::-webkit-slider-thumb {
+input[type=range]::-webkit-slider-thumb {
 	background-color: #6666FF;
 }
 
-#slider2::-moz-range-thumb {
+input[type=range]::-moz-range-thumb {
 	background-color: #6666FF;
 }
 

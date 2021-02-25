@@ -7,19 +7,13 @@ start = function () {
 		return false;
 	}
 	
-	ws = io(host, {
-		"transports": ["polling"], 
-		"transportOptions": {
-			"polling": {
-				"extraHeaders": {
-					"Bypass-Tunnel-Reminder": "1"
-				}
-			}
-		}
+	ws = io({
+		"transports": ["websocket", "polling"]
 	});
 	
 	ws.on("connect", function () {
 		console.log("Connected");
+		document.getElementById("name").blur();
 		document.getElementById("name").disabled = true;
 		document.getElementById("nameForm").style.display = "none";
 		document.getElementById("message").disabled = false;
@@ -46,7 +40,6 @@ start = function () {
 		}
 		document.getElementById("message").value = "";
 	});
-	
 	return false;
 }
 

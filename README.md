@@ -1,52 +1,49 @@
-# InfinityFree and Localtunnel
+# Online Chronicle
 
-## Problem Solved
+## What's New
 
-You want to host a website for free, with your own computer as the server. However, you do not have access to the router. Localtunnel sounds like the best solution for you, but you want a guaranteed subdomain and you do not want to see the Friendly Reminder. If this describes your situation, this solution is for you. 
+The InfinityFree and Localtunnel technology stack that was used in the previous version, Pre-Alpha v0.1.0, had been abandoned in favour of a paid, arbeit cheap, option. Just like in the previous version, this website is hosted with my own computer as the server. However, unlike the previous website, instead of relying on InfinityFree for a guaranteed subdomain and Localtunnel for the tunneling, Dot TK is used to provide an actual domain and Vultr is used to host my own Localtunnel Server. This change achieves two purposes: 
 
-## How It Works
+1. Using Dot TK instead of InfinityFree reduces the overhead of running this website and boosts its performance significantly because Dot TK uses actual DNS that points to the public IP from Vultr, while InfinityFree has to manually handle each HTTP request by running a PHP script and waiting for sockets
+2. Using my own Localtunnel Server instead of the official one removes the limitation of having to add custom headers to all HTTP requests, which significantly increases the amount of things that this website can do smoothy without errors, such as Websockets and HTML5 audio/video tags
 
-InfinityFree is the front-end. Whenever a user accesses InfinityFree, InfinityFree sends an HTTP request to the Localtunnel subdomain, which allowes the backend to process the request and return a response. Localtunnel then sends the response to InfinityFree, which then returns it again. This solves two problems in the same time. First, InfinityFree can keep track of which Localtunnel subdomain is being used, so that the same subdomain (the InfinityFree subdomain, not the Localtunnel subdomain) will always return your website. Second, InfinityFree can send the custom HTTP headers required to bypass the Friendly Reminder at every single HTTP request, removing the Friendly Reminder. 
+## Design Decisions
+
+1. Vultr vs RamNode
+
+	After searching for cheap web hosting, I ended up with two options - Vultr and RamNode. RamNode (which costs 3 dollars per month) is cheaper than Vultr (which costs 5 dollars per month), and I also saw anecdotes that say RamNode has really good customer service. However, RamNode does not have any servers that are near me, while Vultr has. I tried out both of them and did a simple benchmarking to see which one can load up the same website faster. Turns out that Vultr is significantly faster than RamNode. This might be because Vultr's server is much closer to me than RamNode's, but I am not sure. In order to optimize the performance of my website, I therefore decided to use Vultr instead of RamNode in the end. 
+
+2. Localtunnel vs Pagekite
+
+	During the development of this release, I realized that Localtunnel is not the only open source tunneling server around that I can self-host. Pagekite provides similar capabilities, and I really liked to give it a try because they have a beautiful value statement on their Freedom & Privacy page, and their website looks more beautiful than Localtunnel's website. I am able to get **pagekite.py** running on the server just like **localtunnel-server**, then I did a simple benchmarking. However, this revealed that **localtunnel-server** is significantly faster than **pagekite.py**. Therefore, I decided to continue using Localtunnel in the end, instead of switching to Pagekite. However, if you have more powerful servers that can overcome this limitation, I seriously recommend you to give Pagekite a try to help out our fellow freedom-loving people. 
+
+## Technologies Used
+
+Back-end: 
+- SSH
+- PuTTY
+- Node.js
+
+Front-end: 
+- Socket.IO
+- Vue.js
 
 ## Directory Structure
 
 ```
-├───Framework - The things needed to set up InfinityFree and Localtunnel
-│	└───htdocs - The files to be hosted at InfinityFree
-└───Homepage - Put the website that you want to host here
+├───Framework - PuTTY scripts used for server maintainence
+└───Homepage - The website that I am hosting with the server
 	├───backend - The server-side scripts for the website
 	└───frontend - The client-side files of the website
 ```
 
 ## Instructions
 
-1. Make an account at InfinityFree. 
-2. Upload everything in the **Framework\htdocs** folder with the File Manager at InfinityFree. 
-3. Go to CPanel at InfinityFree and set the Error Pages just like how it is in the image **errorPages.png**. Replace **cingjue.rf.gd** with the subdomain you chose for your InfinityFree account. 
-4. Go to **Framework\server.js** and replace any mentions of **cingjue** and **cingjue.rf.gd** with your chosen subdomain. 
-5. Change the variable **viewPort** in **Framework\server.js** to the port where your website is being hosted. 
-6. Run **start.bat** to start your server. 
-
-## Limitations
-
-- **Multiple points of failure.** You are basically doomed if either InfinityFree or Localtunnel are unhappy about what we are doing. 
-- **The website is unscalable.** Localtunnel does not allow more than ten connections to your website in the same time. 
-- **You cannot upgrade protocols.** Having to add custom headers to all HTTP requests prevents protocol upgrades from being possible. 
-
-## Frequently Asked Questions
-
-1. How can I use Websockets? 
-
-	Websockets require protocol upgrades to work, so you cannot. But you can use Socket.IO. Look at **Homepage\backend\server.js** (for the server-side) and **Homepage\frontend\client.js** (for the client-side) for an example of Socket.IO being used. 
-
-2. How can I use HTML5 audio/video tags? 
-
-	HTML5 audio/video tags require protocol upgrades to work, so you cannot. But you can use the fetch API to add custom headers to all HTTP requests to load the audio/video and use JavaScript to render it into the DOM. Look at **Homepage\frontend\audio.js** (for audio) and **Homepage\frontend\video.js** (for video) for an example of how can this work, rendered inside the shadow DOM of custom elements that can be used similarly to HTML5 audio/video tags. 
-
-3. How can I optimize the performance of InfinityFree and Localtunnel? 
-
-	Instead of having to go through both InfinityFree and Localtunnel for every single HTTP request made when loading the same page, you can bet that the Localtunnel subdomain used will not change during the short period of time required for a user to load that page. Then, you can add a short snippet of JavaScript into the page that is being loaded to access **localtunnel.txt** in the root directory of the InfinityFree subdomain you are using. The **localtunnel.txt** tells JavaScript the current Localtunnel subdomain, and JavaScript store it as a variable. Afterwards, you can send the rest of the HTTP requests for loading the page towards that Localtunnel subdomain directly by adding the needed custom headers to all HTTP requests through the fetch API. This way, these HTTP requests will only have to get through Localtunnel, instead of both InfinityFree and Localtunnel, reducing the overhead. Look at **Homepage\frontend\index.js** for an example of this being done. 
-
-4. Why is there a **localtunnel.txt** in the **Homepage\frontend** directory? 
-
-	Sometimes, I would like to test the website on localhost instead of on the InfinityFree subdomain, but then the website will still send HTTP requests to get the current Localtunnel subdomain being used. However, the **localtunnel.txt** was on the InfinityFree subdomain, not on localhost, so this HTTP request throws an 404 error. Adding a **localtunnel.txt** to the **Homepage\frontend** directory solves this problem. However, feel free to remove the **localtunnel.txt** if you are not going to test the website on localhost. 
+1. Make a copy of **Framework\variables (template).txt** and rename it as **variables.txt**. 
+2. Create an instance in Vultr. Use the information provided to fill in the blanks at **Framework\variables.txt**. If you do not know what is your username or port, usually your username would be **root** and your port would be **22**. 
+3. Install PuTTY and edit all the Batch files at the **Framework** directory to correct the paths to the PuTTY executable if nessesary. 
+4. Register your domain at Dot TK and add two DNS records, both pointing to your Vultr public IP address, with one being an A record for just the domain and the other being an A record for the subdomain that you will use for Localtunnel. 
+5. Install Localtunnel globaly and open **Framework\start.bat** to replace the domain and subdomain there with the Dot TK domain and Localtunnel subdomain that you chose in the previous step. 
+6. To install the server, run **Framework\install.bat**. 
+7. To start the server, run **Framework\start.bat**. 
+8. To reboot the server, run **Framework\reboot.bat**. 

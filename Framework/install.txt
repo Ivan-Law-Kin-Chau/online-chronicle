@@ -1,0 +1,8 @@
+apt-get update
+yes | apt-get install nodejs
+yes | apt-get install npm
+yes | apt-get install git
+git clone https://github.com/localtunnel/server.git
+cd server
+npm install
+node -r esm bin/server

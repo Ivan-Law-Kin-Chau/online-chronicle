@@ -1,0 +1,14 @@
+{
+	"scripts": [
+		{
+			"path": "https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js", 
+			"check": "io", 
+			"backup": "libraries/socket.io.min.js"
+		}, 
+		{
+			"path": "/client.js"
+		}
+	], 
+	"props": ["messages", "icon"], 
+	"template": "<div style=\"display: flex; flex-direction: column; max-height: 100vh;\">\n<h3>Chat Room</h3>\n<div id=\"messageBox\" v-if=\"messages.length > 0\" style=\"border: 1px solid #000000; background-color: #EEEEEE; padding: 1em; padding-bottom: 0em; margin-bottom: 1em; flex: 1; overflow: auto;\" v-cloak>\n<div style=\"padding-bottom: 1em;\" v-for=\"(message, index) in messages\">\n<span v-if=\"message.action === 'message'\" v-focus>\n<span style='vertical-align: top;'><b>{{ message.from }}: </b></span>\n<div style='display: inline-block;'>{{ message.content }}</div>\n</span>\n<span v-if=\"message.action === 'error'\" v-focus>\n<button class=\"iconed\" style=\"float: right;\" v-on:click=\"messages.splice(index, 1); $event.currentTarget.blur();\"><img v-bind:src=\"icon.src\"></img></button>\n<span style=\"display: block;\">{{ message.content }}</span>\n</span>\n</div>\n</div>\n<div>\n<span id=\"onlineContainer\" style=\"display: none;\">\n<b>Currently online: </b><span id=\"online\"></span><br><br>\n</span>\n<form id=\"nameForm\" style=\"display: initial;\" onsubmit=\"event.preventDefault(); return start();\" autocomplete=\"off\">\n<b>Your name: </b><input id=\"name\" type=\"text\"/>\n</form>\n<form id=\"messageForm\" style=\"display: none;\" onsubmit=\"event.preventDefault(); return send();\" autocomplete=\"off\">\n<b>Your message: </b><input id=\"message\" type=\"text\" disabled/>\n</form>\n</div>\n</div>"
+}

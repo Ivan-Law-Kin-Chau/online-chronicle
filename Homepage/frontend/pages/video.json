@@ -1,0 +1,11 @@
+{
+	"scripts": [
+		{
+			"path": "/media.js"
+		}, 
+		{
+			"path": "/video.js"
+		}
+	], 
+	"template": "<div>\n<h3>Playing Video</h3>\n<custom-video src=\"/video.mp4\"></custom-video>\n</div>"
+}
